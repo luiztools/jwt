@@ -2,14 +2,12 @@
 require("dotenv-safe").config();
 const jwt = require('jsonwebtoken');
 
-const http = require('http');
 const express = require('express');
 const app = express();
 
 const blacklist = [];
 
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.get('/', (req, res, next) => {
   res.json({ message: "Tudo ok por aqui!" });
@@ -21,7 +19,7 @@ app.get('/clientes', verifyJWT, (req, res, next) => {
 })
 
 function verifyJWT(req, res, next) {
-  var token = req.headers['x-access-token'];
+  var token = req.headers['authorization'];
   if (!token) return res.status(401).json({ auth: false, message: 'No token provided.' });
 
   const index = blacklist.findIndex(item => item === token);
@@ -55,6 +53,4 @@ app.post('/logout', function (req, res) {
   res.json({ auth: false, token: null });
 })
 
-const server = http.createServer(app);
-server.listen(3000);
-console.log("Servidor escutando na porta 3000...")
+app.listen(3000, () => console.log("Servidor escutando na porta 3000..."));
